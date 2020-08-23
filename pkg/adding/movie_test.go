@@ -27,8 +27,19 @@ func TestAddMovie(t *testing.T) {
 
 	s := adding.NewService(mR)
 
-	err := s.AddMovie(m1, m2)
+	movie1, err := s.AddMovie(m1)
 	require.NoError(t, err)
+	assert.EqualValues(t, m1.Title, movie1.Title)
+	assert.EqualValues(t, m1.Plot, movie1.Plot)
+
+	movie1, err = s.AddMovie(m1)
+	require.Error(t, err)
+	assert.EqualValues(t, listing.Movie{}, movie1)
+
+	movie2, err := s.AddMovie(m2)
+	require.NoError(t, err)
+	assert.EqualValues(t, m2.Title, movie2.Title)
+	assert.EqualValues(t, m2.Plot, movie2.Plot)
 
 	movies := mR.GetAllMovies()
 	assert.Len(t, movies, 2)

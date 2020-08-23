@@ -42,6 +42,9 @@ func TestGetMovie(t *testing.T) {
 	require.NoError(t, err)
 	assert.ObjectsAreEqual(m, getM)
 
+	_, err = s.GetMovie("wrong_id")
+	require.Error(t, err)
+
 	require.NoError(t, s.DeleteMovie(m.ID))
 }
 
@@ -87,4 +90,5 @@ func TestDeleteMovie(t *testing.T) {
 	require.NoError(t, err)
 
 	require.NoError(t, s.DeleteMovie(m.ID))
+	require.Error(t, s.DeleteMovie("wronng_id"))
 }

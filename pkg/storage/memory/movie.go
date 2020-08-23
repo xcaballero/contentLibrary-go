@@ -60,17 +60,14 @@ func (s *Storage) GetAllMovies() []listing.Movie {
 func (s *Storage) DeleteMovie(id string) error {
 	for i, m := range s.movies {
 		if m.ID == id {
-			if len(s.movies) == 0 {
-				return listing.ErrMovieNotFound
-			} else if len(s.movies) == 1 {
+			if len(s.movies) == 1 {
 				s.movies = []Movie{}
 				return nil
-			} else {
-				copy(s.movies[i:], s.movies[i+1:])  // Shift a[i+1:] left one index.
-				s.movies[len(s.movies)-1] = Movie{} // Erase last element (write zero value).
-				s.movies = s.movies[:len(s.movies)-1]
-				return nil
 			}
+			copy(s.movies[i:], s.movies[i+1:])  // Shift a[i+1:] left one index.
+			s.movies[len(s.movies)-1] = Movie{} // Erase last element (write zero value).
+			s.movies = s.movies[:len(s.movies)-1]
+			return nil
 		}
 	}
 

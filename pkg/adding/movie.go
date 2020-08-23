@@ -1,6 +1,10 @@
 package adding
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/xcaballero/contentLibrary-go/pkg/listing"
+)
 
 // ErrDuplicateMovie is used when a movie already exists.
 var ErrDuplicateMovie = errors.New("movie already exists")
@@ -12,32 +16,17 @@ type Movie struct {
 }
 
 // AddMovie persists the given movie(s) to storage
-func (s *service) AddMovie(m ...Movie) error {
+func (s *service) AddMovie(m Movie) (listing.Movie, error) {
 	// make sure we don't add any duplicates
 	existingMovies := s.r.GetAllMovies()
-	for _, mm := range m {
-		for _, e := range existingMovies {
-			if mm.Title == e.Title &&
-				mm.Plot == e.Plot {
-				return ErrDuplicateMovie
-			}
+	for _, e := range existingMovies {
+		if m.Title == e.Title &&
+			m.Plot == e.Plot {
+			return listing.Movie{}, ErrDuplicateMovie
 		}
 	}
 
-	// any other validation can be done here
-	for _, movie := range m {
-		_, _ = s.r.AddMovie(movie) // error handling omitted for simplicity
-	}
+	movie, err := s.r.AddMovie(m) // error handling omitted for simplicity
 
-	return nil
-}
-
-// AddSampleMovies adds some sample movies to the database
-func (s *service) AddSampleMovies(m []Movie) {
-
-	// any validation can be done here
-
-	for _, mm := range m {
-		_, _ = s.r.AddMovie(mm) // error handling omitted for simplicity
-	}
+	return movie, err
 }

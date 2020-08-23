@@ -13,7 +13,7 @@ type Service interface {
 	// GetMovie returns the movie with given ID.
 	GetMovie(string) (Movie, error)
 	// GetAllMovies returns all movies saved in storage.
-	GetMovies() []Movie
+	ListMovies() []Movie
 }
 
 type service struct {

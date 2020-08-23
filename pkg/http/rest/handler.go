@@ -12,7 +12,7 @@ import (
 func Handler(a adding.Service, l listing.Service) http.Handler {
 	router := httprouter.New()
 
-	router.GET("/movies", getMovies(l))
+	router.GET("/movies", listMovies(l))
 	router.GET("/movies/:id", getMovie(l))
 	router.POST("/movies", addMovie(a))
 

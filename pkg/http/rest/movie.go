@@ -21,7 +21,7 @@ func addMovie(s adding.Service) func(w http.ResponseWriter, r *http.Request, _ h
 			return
 		}
 
-		_ = s.AddMovie(newMovie)
+		_, _ = s.AddMovie(newMovie)
 		// error handling omitted for simplicity
 
 		w.Header().Set("Content-Type", "application/json")
@@ -29,11 +29,11 @@ func addMovie(s adding.Service) func(w http.ResponseWriter, r *http.Request, _ h
 	}
 }
 
-// getMovies returns a handler for GET /mvoies requests
-func getMovies(s listing.Service) func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+// listMovies returns a handler for GET /mvoies requests
+func listMovies(s listing.Service) func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		w.Header().Set("Content-Type", "application/json")
-		list := s.GetMovies()
+		list := s.ListMovies()
 		json.NewEncoder(w).Encode(list)
 	}
 }

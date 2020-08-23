@@ -16,8 +16,8 @@ type Movie struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-// GetMovies returns all movies
-func (s *service) GetMovies() []Movie {
+// ListMovies returns all movies
+func (s *service) ListMovies() []Movie {
 	return s.r.GetAllMovies()
 }
 
