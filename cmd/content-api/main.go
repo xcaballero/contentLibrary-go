@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/xcaballero/contentLibrary-go/pkg/repository"
+
 	"github.com/xcaballero/contentLibrary-go/pkg/adding"
 	"github.com/xcaballero/contentLibrary-go/pkg/http/rest"
 	"github.com/xcaballero/contentLibrary-go/pkg/listing"
@@ -26,22 +28,27 @@ func main() {
 	// Set up storage
 	storageType := JSON
 
+	var repo repository.Repository
 	var adder adding.Service
 	var lister listing.Service
 
 	switch storageType {
 	case Memory:
-		s := new(memory.Storage)
+		storage := new(memory.Storage)
+		cache := new(memory.Storage)
 
-		adder = adding.NewService(s)
-		lister = listing.NewService(s)
+		repo = repository.NewRepository(storage, cache)
+		adder = adding.NewService(repo)
+		lister = listing.NewService(repo)
 
 	case JSON:
 		// error handling omitted for simplicity.
-		s, _ := json.NewStorage()
+		storage, _ := json.NewStorage()
+		cache, _ := json.NewStorage()
 
-		adder = adding.NewService(s)
-		lister = listing.NewService(s)
+		repo = repository.NewRepository(storage, cache)
+		adder = adding.NewService(repo)
+		lister = listing.NewService(repo)
 	}
 
 	// set up the HTTP server

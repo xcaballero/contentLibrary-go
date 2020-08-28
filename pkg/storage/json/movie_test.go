@@ -45,6 +45,9 @@ func TestGetMovie(t *testing.T) {
 	require.NoError(t, err)
 	assert.ObjectsAreEqual(m, getM)
 
+	_, err = s.GetMovie("wrong_id")
+	require.Error(t, err)
+
 	require.NoError(t, s.DeleteMovie(m.ID))
 }
 

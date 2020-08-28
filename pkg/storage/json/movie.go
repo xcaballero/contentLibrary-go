@@ -38,7 +38,11 @@ func (s *Storage) AddMovie(m adding.Movie) (listing.Movie, error) {
 func (s *Storage) GetMovie(id string) (listing.Movie, error) {
 	var m Movie
 
-	return m.toListing(), s.db.Read(CollectionMovie, id, &m)
+	err := s.db.Read(CollectionMovie, id, &m)
+	if err != nil {
+		return listing.Movie{}, listing.ErrMovieNotFound
+	}
+	return m.toListing(), nil
 }
 
 // GetAllMovies returns all movies
