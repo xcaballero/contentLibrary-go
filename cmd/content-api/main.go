@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/xcaballero/contentLibrary-go/pkg/deleting"
+
 	"github.com/xcaballero/contentLibrary-go/pkg/repository"
 
 	"github.com/xcaballero/contentLibrary-go/pkg/adding"
@@ -31,6 +33,7 @@ func main() {
 	var repo repository.Repository
 	var adder adding.Service
 	var lister listing.Service
+	var deleter deleting.Service
 
 	switch storageType {
 	case Memory:
@@ -40,6 +43,7 @@ func main() {
 		repo = repository.NewRepository(storage, cache)
 		adder = adding.NewService(repo)
 		lister = listing.NewService(repo)
+		deleter = deleting.NewService(repo)
 
 	case JSON:
 		// error handling omitted for simplicity.
@@ -49,10 +53,11 @@ func main() {
 		repo = repository.NewRepository(storage, cache)
 		adder = adding.NewService(repo)
 		lister = listing.NewService(repo)
+		deleter = deleting.NewService(repo)
 	}
 
 	// set up the HTTP server
-	router := rest.Handler(adder, lister)
+	router := rest.Handler(adder, lister, deleter)
 
 	fmt.Println("The content library server is on tap now: https://localhost:5000")
 	log.Fatal(http.ListenAndServe(":5000", router))

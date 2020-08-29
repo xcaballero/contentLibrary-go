@@ -6,6 +6,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/xcaballero/contentLibrary-go/pkg/adding"
+	"github.com/xcaballero/contentLibrary-go/pkg/deleting"
 	"github.com/xcaballero/contentLibrary-go/pkg/listing"
 )
 
@@ -45,6 +46,22 @@ func getMovie(s listing.Service) func(w http.ResponseWriter, r *http.Request, p 
 
 		movie, err := s.GetMovie(ID)
 		if err == listing.ErrMovieNotFound {
+			http.Error(w, "The movie you requested does not exist.", http.StatusNotFound)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(movie)
+	}
+}
+
+// deleteMovie returns a handler for DELETE /movies/:id requests
+func deleteMovie(s deleting.Service) func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		ID := p.ByName("id")
+
+		movie, err := s.DeleteMovie(ID)
+		if err == deleting.ErrMovieNotFound {
 			http.Error(w, "The movie you requested does not exist.", http.StatusNotFound)
 			return
 		}
