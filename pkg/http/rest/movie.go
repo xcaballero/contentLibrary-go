@@ -1,72 +1,67 @@
 package rest
 
 import (
-	"encoding/json"
 	"net/http"
 
-	"github.com/julienschmidt/httprouter"
+	"github.com/gin-gonic/gin"
+
 	"github.com/xcaballero/contentLibrary-go/pkg/adding"
 	"github.com/xcaballero/contentLibrary-go/pkg/deleting"
 	"github.com/xcaballero/contentLibrary-go/pkg/listing"
 )
 
 // addMovie returns a handler for POST /movies request
-func addMovie(s adding.Service) func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-		decoder := json.NewDecoder(r.Body)
-
+func addMovie(s adding.Service) func(c *gin.Context) {
+	return func(c *gin.Context) {
 		var newMovie adding.Movie
-		err := decoder.Decode(&newMovie)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+		if err := c.ShouldBindJSON(&newMovie); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		_, _ = s.AddMovie(newMovie)
-		// error handling omitted for simplicity
+		m, err := s.AddMovie(newMovie)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
 
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode("New movie added.")
+		c.JSON(200, m)
 	}
 }
 
 // listMovies returns a handler for GET /mvoies requests
-func listMovies(s listing.Service) func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-		w.Header().Set("Content-Type", "application/json")
-		list := s.ListMovies()
-		json.NewEncoder(w).Encode(list)
+func listMovies(s listing.Service) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		c.JSON(200, s.ListMovies())
 	}
 }
 
 // getMovie returns a handler for GET /movies/:id requests
-func getMovie(s listing.Service) func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		ID := p.ByName("id")
+func getMovie(s listing.Service) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		ID := c.Param("id")
 
-		movie, err := s.GetMovie(ID)
+		m, err := s.GetMovie(ID)
 		if err == listing.ErrMovieNotFound {
-			http.Error(w, "The movie you requested does not exist.", http.StatusNotFound)
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(movie)
+		c.JSON(200, m)
 	}
 }
 
 // deleteMovie returns a handler for DELETE /movies/:id requests
-func deleteMovie(s deleting.Service) func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		ID := p.ByName("id")
+func deleteMovie(s deleting.Service) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		ID := c.Param("id")
 
-		movie, err := s.DeleteMovie(ID)
+		m, err := s.DeleteMovie(ID)
 		if err == deleting.ErrMovieNotFound {
-			http.Error(w, "The movie you requested does not exist.", http.StatusNotFound)
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(movie)
+		c.JSON(200, m)
 	}
 }

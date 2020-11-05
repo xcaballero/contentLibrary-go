@@ -3,15 +3,12 @@ package main
 import (
 	"fmt"
 	"log"
-	"net/http"
-
-	"github.com/xcaballero/contentLibrary-go/pkg/deleting"
-
-	"github.com/xcaballero/contentLibrary-go/pkg/repository"
 
 	"github.com/xcaballero/contentLibrary-go/pkg/adding"
+	"github.com/xcaballero/contentLibrary-go/pkg/deleting"
 	"github.com/xcaballero/contentLibrary-go/pkg/http/rest"
 	"github.com/xcaballero/contentLibrary-go/pkg/listing"
+	"github.com/xcaballero/contentLibrary-go/pkg/repository"
 	"github.com/xcaballero/contentLibrary-go/pkg/storage/json"
 	"github.com/xcaballero/contentLibrary-go/pkg/storage/memory"
 )
@@ -60,5 +57,5 @@ func main() {
 	router := rest.Handler(adder, lister, deleter)
 
 	fmt.Println("The content library server is on tap now: https://localhost:5000")
-	log.Fatal(http.ListenAndServe(":5000", router))
+	log.Fatal(router.Run(":5000"))
 }
