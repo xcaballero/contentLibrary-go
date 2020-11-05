@@ -45,6 +45,9 @@ func getMovie(s listing.Service) func(c *gin.Context) {
 		if err == listing.ErrMovieNotFound {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
+		} else if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
 		}
 
 		c.JSON(200, m)
